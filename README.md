@@ -66,17 +66,28 @@ particular, it is nicely combined with
 [Tokenizer](https://spark.apache.org/docs/latest/ml-features.html#tokenizer).
 
 ```scala
-import org.apache.spark.mllib.feature.Stemmer
+import org.apache.spark.ml.feature.{ CountVectorizer, CountVectorizerModel, RegexTokenizer, StopWordsRemover,Stemmer }
 
 val data = sqlContext
-  .createDataFrame(Seq(("мама", 1), ("мыла", 2), ("раму", 3)))
+  .createDataFrame(Seq(("coucou", 1), ("la voiture", 2), ("la chance", 3)))
   .toDF("word", "id")
 
-val stemmed = new Stemmer()
-  .setInputCol("word")
-  .setOutputCol("stemmed")
-  .setLanguage("Russian")
-  .transform(data)
+ // Pipeline stages
+    val tokenizer = new RegexTokenizer()
+      .setInputCol("word")
+      .setPattern("[a-z0-9éèêâîûùäüïëô]+")
+      .setGaps(false)
+      .setOutputCol("rawTokens")
 
-stemmed.show
+    val stopWordsRemover = new StopWordsRemover()
+      .setInputCol("rawTokens")
+      .setOutputCol("tokens")
+    stopWordsRemover.setStopWords(stopWordsRemover.getStopWords ++ stopWordText)
+
+    val stemmer = new Stemmer()
+      .setInputCol("tokens")
+      .setOutputCol("stemmed")
+      .setLanguage("French")
+      
+stemmer.transform(stopWordsRemover.transform(tokenizer.transform(data.select("word")))).show
 ```
