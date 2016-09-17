@@ -1,4 +1,4 @@
-package org.apache.spark.mllib.feature
+package org.apache.spark.ml.feature
 
 import org.scalatest.Suite
 import org.scalatest.BeforeAndAfterAll
