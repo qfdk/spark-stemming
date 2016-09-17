@@ -7,11 +7,11 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
   test("Stemming of Freanch words") {
 
     val data = sqlContext.createDataFrame(Seq(
-      ("chance", 1),
-      ("voiture", 2),
-      ("sasa", 3),
-      ("pomme", 4),
-      ("pommes", 5))).toDF("word", "id")
+      ("Trouvez votre Voiture d'occasion parmi des milliers de petites", 1),
+      ("Découvrez gratuitement tous les articles", 2),
+      ("majorité", 3),
+      ("contractés", 4),
+      ("contradictoirement", 5))).toDF("word", "id")
 
     val tokenizer = new RegexTokenizer()
       .setInputCol("word")
@@ -21,6 +21,7 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
 
     val stemmed = new Stemmer()
       .setInputCol("rawTokens")
+      .setLanguage("French")
       .setOutputCol("stemmed")
 
     stemmed.transform(tokenizer.transform(data)).show
@@ -33,18 +34,18 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
       ("bildelar", 2),
       ("biltillbehör", 3))).toDF("word", "id")
 
-//    val stemmed = new Stemmer()
-//      .setInputCol("word")
-//      .setOutputCol("stemmed")
-//      .setLanguage("Swedish")
-//      .transform(data.select("word")).show
+    //    val stemmed = new Stemmer()
+    //      .setInputCol("word")
+    //      .setOutputCol("stemmed")
+    //      .setLanguage("Swedish")
+    //      .transform(data.select("word")).show
 
-//    val expected = sqlContext.createDataFrame(Seq(
-//      ("övrigt", 1, "övr"),
-//      ("bildelar", 2, "bildel"),
-//      ("biltillbehör", 3, "biltillbehör"))).toDF("word", "id", "stemmed")
-//
-//    assert(stemmed.collect().deep == expected.collect().deep)
+    //    val expected = sqlContext.createDataFrame(Seq(
+    //      ("övrigt", 1, "övr"),
+    //      ("bildelar", 2, "bildel"),
+    //      ("biltillbehör", 3, "biltillbehör"))).toDF("word", "id", "stemmed")
+    //
+    //    assert(stemmed.collect().deep == expected.collect().deep)
   }
-  
+
 }
