@@ -1,7 +1,6 @@
 package org.apache.spark.ml.feature
-
 import org.scalatest.FunSuite
-import org.apache.spark.ml.feature.{ RegexTokenizer, StopWordsRemover }
+import org.apache.spark.ml.feature.{Stemmer,RegexTokenizer, StopWordsRemover,AccentRemover }
 
 class StemmerSuite extends FunSuite with LocalSparkContext {
   test("Stemming of Freanch words") {
@@ -11,7 +10,7 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
       ("Découvrez gratuitement tous les articles", 2),
       ("majorité", 3),
       ("contractés", 4),
-      ("contradictoirement", 5))).toDF("word", "id")
+      ("éèêë", 5))).toDF("word", "id")
 
     val tokenizer = new RegexTokenizer()
       .setInputCol("word")
@@ -24,7 +23,11 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
       .setLanguage("French")
       .setOutputCol("stemmed")
 
-    stemmed.transform(tokenizer.transform(data)).show
+    var accentRemover= new AccentRemover()
+      .setInputCol("stemmed")
+      .setOutputCol("mot")
+      
+    accentRemover.transform(stemmed.transform(tokenizer.transform(data))).show
 
   }
 
@@ -33,19 +36,6 @@ class StemmerSuite extends FunSuite with LocalSparkContext {
       ("övrigt", 1),
       ("bildelar", 2),
       ("biltillbehör", 3))).toDF("word", "id")
-
-    //    val stemmed = new Stemmer()
-    //      .setInputCol("word")
-    //      .setOutputCol("stemmed")
-    //      .setLanguage("Swedish")
-    //      .transform(data.select("word")).show
-
-    //    val expected = sqlContext.createDataFrame(Seq(
-    //      ("övrigt", 1, "övr"),
-    //      ("bildelar", 2, "bildel"),
-    //      ("biltillbehör", 3, "biltillbehör"))).toDF("word", "id", "stemmed")
-    //
-    //    assert(stemmed.collect().deep == expected.collect().deep)
   }
 
 }
